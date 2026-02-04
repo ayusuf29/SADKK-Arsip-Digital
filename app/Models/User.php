@@ -46,4 +46,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function adminlte_profile_url()
+    {
+        return route('admin.profile');
+    }
 }

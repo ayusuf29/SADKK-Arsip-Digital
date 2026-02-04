@@ -3,34 +3,36 @@
 namespace App\Repositories\Implementations;
 
 use App\Repositories\Interfaces\SuratRepositoryInterface;
-use App\Models\Surat;
+use App\Models\Document;
 
 class SuratRepository implements SuratRepositoryInterface
 {
     public function all()
     {
-        return Surat::all();
+        return Document::where('type', 'surat')->orderBy('created_at', 'desc')->get();
     }
 
     public function find($id)
     {
-        return Surat::findOrFail($id);
+        return Document::where('type', 'surat')->findOrFail($id);
     }
 
     public function create(array $data)
     {
-        return Surat::create($data);
+        $data['type'] = 'surat';
+        return Document::create($data);
     }
 
     public function update($id, array $data)
     {
-        $surat = Surat::findOrFail($id);
+        $surat = Document::where('type', 'surat')->findOrFail($id);
         $surat->update($data);
         return $surat;
     }
 
     public function delete($id)
     {
-        return Surat::destroy($id);
+        $surat = Document::where('type', 'surat')->findOrFail($id);
+        return $surat->delete();
     }
 }

@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('perjanjian_kredits', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('nomor_pk');
-            $table->string('nama_debitur');
-            $table->decimal('plafon', 15, 2);
-            $table->date('tanggal_akad');
-            $table->integer('jangka_waktu')->comment('Dalam bulan');
-            $table->string('file_path')->nullable();
+            $table->string('filename');
+            $table->enum('type', ['surat', 'invoice', 'kredit']);
+            $table->string('file_url');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('perjanjian_kredits');
+        Schema::dropIfExists('documents');
     }
 };

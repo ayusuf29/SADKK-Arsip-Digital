@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\SuratController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\PerjanjianKreditController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProfileController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,6 +21,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::resource('invoice', InvoiceController::class);
     Route::resource('perjanjian-kredit', PerjanjianKreditController::class);
     Route::resource('users', UserController::class);
+    Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+    
+    // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 Auth::routes();
