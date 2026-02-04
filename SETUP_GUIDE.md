@@ -34,6 +34,17 @@ We used the `jeroennoten/laravel-adminlte` package for the admin dashboard.
 
 ### 3.1. Database Configuration
 -   Updated `.env` to connect to the local XAMPP MySQL database `sadkk_banksulteng`.
+-   **Note**: Ensure `DB_USERNAME` and `DB_PASSWORD` in `.env` match your XAMPP MySQL credentials.
+    -   Default XAMPP Username: `root`
+    -   Default XAMPP Password: (empty)
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=sadkk_banksulteng
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
 
 ### 3.2. Custom Authentication (Username)
 -   **Migration**: Modified the `users` table migration to include a `username` column and make `email` nullable.
@@ -67,12 +78,12 @@ For each module (Surat, Invoice, PerjanjianKredit, User), we created:
 
 | Module | Table Name | Key Features |
 | :--- | :--- | :--- |
-| **Surat** | `surats` | Incoming/Outgoing letters, file attachment |
-| **Invoice** | `invoices` | Client name, amount, status (paid/unpaid) |
-| **Perjanjian Kredit** | `perjanjian_kredits` | Debtor name, ceiling (plafon), term (jangka waktu) |
-| **User Management** | `users` | Admin user management |
+| **Surat** | `documents` | Unified table for docs (Type: surat, Jenis: masuk/keluar) |
+| **Invoice** | `documents` | Unified table for docs (Type: invoice, Jenis: masuk/keluar) |
+| **Perjanjian Kredit** | `documents` | Unified table for docs (Type: kredit) |
+| **User Management** | `users` | Admin user management, Profile password change |
 
-## 6. How to Run
+## 6. How to Run (Development)
 
 1.  **Start Database**: Ensure XAMPP MySQL is running.
 2.  **Run Migrations & Seed**:
@@ -99,5 +110,66 @@ For each module (Surat, Invoice, PerjanjianKredit, User), we created:
     git config user.name "SADKK Developer"
     git config user.email "dev@sadkk.local"
     git add .
-    git commit -m "Initial commit: Laravel 12 AdminLTE setup with Repository Pattern"
+    git commit -m "Initial commit..."
     ```
+
+## 8. Running on XAMPP (Apache Production-like)
+
+To run the application using XAMPP's Apache server instead of `php artisan serve`, follow these steps:
+
+### Method A: Virtual Host (Recommended)
+This method allows you to access the app via a custom domain (e.g., `http://sadkk.local`) without moving the project folder.
+
+1.  **Enable Virtual Hosts in Apache**:
+    -   Open `C:\xampp\apache\conf\httpd.conf` (or wherever XAMPP is installed).
+    -   Uncomment (remove `#`) the line: `Include conf/extra/httpd-vhosts.conf`.
+
+2.  **Configure the Virtual Host**:
+    -   Open `C:\xampp\apache\conf\extra\httpd-vhosts.conf`.
+    -   Add the following configuration:
+        ```apache
+        <VirtualHost *:80>
+            DocumentRoot "D:/project/php/sadkk-banksulteng/sadkk/public"
+            ServerName sadkk.local
+            <Directory "D:/project/php/sadkk-banksulteng/sadkk/public">
+                Options Indexes FollowSymLinks
+                AllowOverride All
+                Require all granted
+            </Directory>
+        </VirtualHost>
+        ```
+
+3.  **Update Windows Hosts File**:
+    -   Run Notepad as Administrator.
+    -   Open `C:\Windows\System32\drivers\etc\hosts`.
+    -   Add this line at the bottom:
+        ```
+        127.0.0.1 sadkk.local
+        ```
+
+4.  **Restart Apache**:
+    -   Stop and Start Apache via the XAMPP Control Panel.
+
+5.  **Update .env**:
+    -   Open `.env` in the project root.
+    -   Change `APP_URL` to:
+        ```
+        APP_URL=http://sadkk.local
+        ```
+
+### Method B: Access via Subdirectory (Easiest)
+If you don't want to set up a Virtual Host, you can access it via `localhost`.
+
+1.  **Create a Symlink** (Recommended over copying):
+    -   Open Command Prompt as Administrator.
+    -   Run:
+        ```cmd
+        mklink /J "C:\xampp\htdocs\sadkk" "D:\project\php\sadkk-banksulteng\sadkk"
+        ```
+    -   *Note: Adjust `C:\xampp\htdocs` to your actual XAMPP path.*
+
+2.  **Access in Browser**:
+    -   Go to: `http://localhost/sadkk/public`
+
+3.  **Update .env**:
+    -   Change `APP_URL=http://localhost/sadkk/public`
