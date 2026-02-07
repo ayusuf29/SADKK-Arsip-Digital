@@ -335,6 +335,7 @@ return [
             'text' => 'Manajemen User',
             'url'  => 'admin/users',
             'icon' => 'fas fa-fw fa-users',
+            'can'  => 'manage-users',
         ],
     ],
 

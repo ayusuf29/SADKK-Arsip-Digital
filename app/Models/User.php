@@ -22,6 +22,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -50,5 +51,15 @@ class User extends Authenticatable
     public function adminlte_profile_url()
     {
         return route('admin.profile');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOperator()
+    {
+        return $this->role === 'operator';
     }
 }

@@ -52,31 +52,41 @@
                 <thead>
                     <tr>
                         <th style="width: 5%">No</th>
+                        <th>No Invoice</th>
+                        <th>Tgl Invoice</th>
+                        <th>Asal/Tujuan</th>
+                        <th style="width: 10%">Jenis</th>
                         <th>Filename</th>
-                        <th style="width: 15%">Jenis</th>
-                        <th style="width: 20%">Created At</th>
-                        <th style="width: 20%">Action</th>
+                        <th style="width: 15%">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($documents as $index => $doc)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $doc->filename }}</td>
-                            <td>{{ ucfirst($doc->jenis) }}</td>
-                            <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
+                            <td>{{ $doc->nomor_dokumen }}</td>
+                            <td>{{ $doc->tanggal_dokumen ? \Carbon\Carbon::parse($doc->tanggal_dokumen)->format('d-m-Y') : '-' }}</td>
                             <td>
-                                <a href="{{ $doc->file_url }}" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> View
+                                @if($doc->jenis == 'masuk')
+                                    Dari: {{ $doc->pengirim }}
+                                @else
+                                    Tujuan: {{ $doc->penerima }}
+                                @endif
+                            </td>
+                            <td><span class="badge {{ $doc->jenis == 'masuk' ? 'badge-success' : 'badge-warning' }}">{{ ucfirst($doc->jenis) }}</span></td>
+                            <td>{{ $doc->filename }}</td>
+                            <td>
+                                <a href="{{ $doc->file_url }}" target="_blank" class="btn btn-xs btn-info" title="View">
+                                    <i class="fas fa-eye"></i>
                                 </a>
-                                <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modal-edit-{{ $doc->id }}">
-                                    <i class="fas fa-edit"></i> Edit
+                                <button class="btn btn-xs btn-warning" data-toggle="modal" data-target="#modal-edit-{{ $doc->id }}" title="Edit">
+                                    <i class="fas fa-edit"></i>
                                 </button>
                                 <form action="{{ route('admin.invoice.destroy', $doc->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i> Delete
+                                    <button type="submit" class="btn btn-xs btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                             </td>
@@ -101,19 +111,35 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="filename">Filename</label>
-                            <input type="text" class="form-control" id="filename" name="filename" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="jenis">Jenis</label>
-                            <select class="form-control" id="jenis" name="jenis" required>
+                            <label for="jenis">Jenis Invoice</label>
+                            <select class="form-control" id="jenis" name="jenis" required onchange="toggleFields(this.value, 'create')">
                                 <option value="">-- Select Jenis --</option>
-                                <option value="masuk">Masuk</option>
-                                <option value="keluar">Keluar</option>
+                                <option value="masuk">Invoice Masuk</option>
+                                <option value="keluar">Invoice Keluar</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="file">File</label>
+                            <label>No Invoice</label>
+                            <input type="text" class="form-control" name="nomor_dokumen">
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Invoice</label>
+                            <input type="date" class="form-control" name="tanggal_dokumen">
+                        </div>
+                        <div class="form-group" id="group-pengirim-create" style="display:none;">
+                            <label>Dari (Pengirim)</label>
+                            <input type="text" class="form-control" name="pengirim">
+                        </div>
+                        <div class="form-group" id="group-penerima-create" style="display:none;">
+                            <label>Tujuan (Penerima)</label>
+                            <input type="text" class="form-control" name="penerima">
+                        </div>
+                        <div class="form-group">
+                            <label for="filename">Judul File (Filename)</label>
+                            <input type="text" class="form-control" id="filename" name="filename" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="file">Upload File</label>
                             <input type="file" class="form-control-file" id="file" name="file" required>
                             <small class="form-text text-muted">Allowed: PDF, JPG, PNG. Max 10MB.</small>
                         </div>
@@ -143,15 +169,31 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Filename</label>
-                                <input type="text" class="form-control" name="filename" value="{{ $doc->filename }}" required>
+                                <label>Jenis Invoice</label>
+                                <select class="form-control" name="jenis" required onchange="toggleFields(this.value, 'edit-{{ $doc->id }}')">
+                                    <option value="masuk" {{ $doc->jenis == 'masuk' ? 'selected' : '' }}>Invoice Masuk</option>
+                                    <option value="keluar" {{ $doc->jenis == 'keluar' ? 'selected' : '' }}>Invoice Keluar</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label>Jenis</label>
-                                <select class="form-control" name="jenis" required>
-                                    <option value="masuk" {{ $doc->jenis == 'masuk' ? 'selected' : '' }}>Masuk</option>
-                                    <option value="keluar" {{ $doc->jenis == 'keluar' ? 'selected' : '' }}>Keluar</option>
-                                </select>
+                                <label>No Invoice</label>
+                                <input type="text" class="form-control" name="nomor_dokumen" value="{{ $doc->nomor_dokumen }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal Invoice</label>
+                                <input type="date" class="form-control" name="tanggal_dokumen" value="{{ $doc->tanggal_dokumen ? \Carbon\Carbon::parse($doc->tanggal_dokumen)->format('Y-m-d') : '' }}">
+                            </div>
+                            <div class="form-group" id="group-pengirim-edit-{{ $doc->id }}" style="{{ $doc->jenis == 'masuk' ? '' : 'display:none;' }}">
+                                <label>Dari (Pengirim)</label>
+                                <input type="text" class="form-control" name="pengirim" value="{{ $doc->pengirim }}">
+                            </div>
+                            <div class="form-group" id="group-penerima-edit-{{ $doc->id }}" style="{{ $doc->jenis == 'keluar' ? '' : 'display:none;' }}">
+                                <label>Tujuan (Penerima)</label>
+                                <input type="text" class="form-control" name="penerima" value="{{ $doc->penerima }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Judul File (Filename)</label>
+                                <input type="text" class="form-control" name="filename" value="{{ $doc->filename }}" required>
                             </div>
                             <div class="form-group">
                                 <label>File (Leave empty to keep current)</label>
@@ -176,17 +218,31 @@
 
 @section('js')
     <script>
+        function toggleFields(jenis, idSuffix) {
+            if (jenis === 'masuk') {
+                $('#group-pengirim-' + idSuffix).show();
+                $('#group-penerima-' + idSuffix).hide();
+            } else if (jenis === 'keluar') {
+                $('#group-pengirim-' + idSuffix).hide();
+                $('#group-penerima-' + idSuffix).show();
+            } else {
+                $('#group-pengirim-' + idSuffix).hide();
+                $('#group-penerima-' + idSuffix).hide();
+            }
+        }
+
         $(document).ready(function() {
             var table = $('#table-documents').DataTable({
-                "order": [[ 3, "desc" ]], // Sort by Created At (column 3 now)
+                "order": [[ 2, "desc" ]], // Sort by Tgl Invoice
                 "columnDefs": [
-                    { "orderable": false, "targets": [4] } // Disable sort on Action column (column 4 now)
+                    { "orderable": false, "targets": [6] }
                 ],
                 "responsive": true,
             });
 
             $('#filter-jenis').on('change', function() {
-                table.column(2).search(this.value).draw();
+                // Column 4 is 'Jenis'
+                table.column(4).search(this.value).draw();
             });
         });
     </script>

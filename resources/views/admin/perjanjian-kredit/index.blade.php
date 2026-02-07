@@ -41,29 +41,33 @@
                 <thead>
                     <tr>
                         <th style="width: 5%">No</th>
+                        <th>No PK</th>
+                        <th>Tgl PK</th>
+                        <th>Nama Peminjam</th>
                         <th>Filename</th>
-                        <th style="width: 20%">Created At</th>
-                        <th style="width: 20%">Action</th>
+                        <th style="width: 15%">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($documents as $index => $doc)
                         <tr>
                             <td>{{ $index + 1 }}</td>
+                            <td>{{ $doc->nomor_dokumen }}</td>
+                            <td>{{ $doc->tanggal_dokumen ? \Carbon\Carbon::parse($doc->tanggal_dokumen)->format('d-m-Y') : '-' }}</td>
+                            <td>{{ $doc->nama_peminjam }}</td>
                             <td>{{ $doc->filename }}</td>
-                            <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
                             <td>
-                                <a href="{{ $doc->file_url }}" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> View
+                                <a href="{{ $doc->file_url }}" target="_blank" class="btn btn-xs btn-info" title="View">
+                                    <i class="fas fa-eye"></i>
                                 </a>
-                                <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modal-edit-{{ $doc->id }}">
-                                    <i class="fas fa-edit"></i> Edit
+                                <button class="btn btn-xs btn-warning" data-toggle="modal" data-target="#modal-edit-{{ $doc->id }}" title="Edit">
+                                    <i class="fas fa-edit"></i>
                                 </button>
                                 <form action="{{ route('admin.perjanjian-kredit.destroy', $doc->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i> Delete
+                                    <button type="submit" class="btn btn-xs btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                             </td>
@@ -88,11 +92,23 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="filename">Filename</label>
+                            <label>No PK</label>
+                            <input type="text" class="form-control" name="nomor_dokumen">
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal PK</label>
+                            <input type="date" class="form-control" name="tanggal_dokumen">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Peminjam</label>
+                            <input type="text" class="form-control" name="nama_peminjam">
+                        </div>
+                        <div class="form-group">
+                            <label for="filename">Judul File (Filename)</label>
                             <input type="text" class="form-control" id="filename" name="filename" required>
                         </div>
                         <div class="form-group">
-                            <label for="file">File</label>
+                            <label for="file">Upload File</label>
                             <input type="file" class="form-control-file" id="file" name="file" required>
                             <small class="form-text text-muted">Allowed: PDF, JPG, PNG. Max 10MB.</small>
                         </div>
@@ -122,7 +138,19 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Filename</label>
+                                <label>No PK</label>
+                                <input type="text" class="form-control" name="nomor_dokumen" value="{{ $doc->nomor_dokumen }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal PK</label>
+                                <input type="date" class="form-control" name="tanggal_dokumen" value="{{ $doc->tanggal_dokumen ? \Carbon\Carbon::parse($doc->tanggal_dokumen)->format('Y-m-d') : '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Peminjam</label>
+                                <input type="text" class="form-control" name="nama_peminjam" value="{{ $doc->nama_peminjam }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Judul File (Filename)</label>
                                 <input type="text" class="form-control" name="filename" value="{{ $doc->filename }}" required>
                             </div>
                             <div class="form-group">
@@ -150,9 +178,9 @@
     <script>
         $(document).ready(function() {
             $('#table-documents').DataTable({
-                "order": [[ 2, "desc" ]], // Sort by Created At (column 2)
+                "order": [[ 2, "desc" ]], // Sort by Tgl PK
                 "columnDefs": [
-                    { "orderable": false, "targets": [3] } // Disable sort on Action column
+                    { "orderable": false, "targets": [5] }
                 ],
                 "responsive": true,
             });

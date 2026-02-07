@@ -20,14 +20,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::resource('surat', SuratController::class);
     Route::resource('invoice', InvoiceController::class);
     Route::resource('perjanjian-kredit', PerjanjianKreditController::class);
-    Route::resource('users', UserController::class);
-    Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+
+    // User Management (Admin Only)
+    Route::middleware(['can:manage-users'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+    });
     
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 });
-
-Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

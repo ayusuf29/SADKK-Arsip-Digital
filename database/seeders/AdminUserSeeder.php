@@ -14,11 +14,26 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Administrator',
-            'username' => 'admin',
-            'email' => 'admin@banksulteng.co.id',
-            'password' => Hash::make('password'),
-        ]);
+        // Admin User
+        User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Administrator',
+                'email' => 'admin@banksulteng.co.id',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
+
+        // Operator User
+        User::updateOrCreate(
+            ['username' => 'operator'],
+            [
+                'name' => 'Operator',
+                'email' => 'operator@banksulteng.co.id',
+                'password' => Hash::make('password'),
+                'role' => 'operator',
+            ]
+        );
     }
 }

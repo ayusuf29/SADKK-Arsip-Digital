@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
+            DocumentSeeder::class,
         ]);
         
         // Optional: Create a test user if needed, but ensure username is provided if not using factory default
