@@ -35,8 +35,37 @@
             <button class="btn btn-primary" data-toggle="modal" data-target="#modal-create">
                 <i class="fas fa-plus"></i> Add New
             </button>
+            <button type="button" onclick="exportPdf()" class="btn btn-danger ml-2">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
         </div>
         <div class="card-body">
+            <form method="GET" action="{{ route('admin.invoice.index') }}" id="filter-form" class="mb-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Filter by Period:</label>
+                        <select name="period" class="form-control" id="period-select" onchange="toggleCustomDate()">
+                            <option value="">-- All Time --</option>
+                            <option value="1_month" {{ request('period') == '1_month' ? 'selected' : '' }}>Last 1 Month</option>
+                            <option value="3_months" {{ request('period') == '3_months' ? 'selected' : '' }}>Last 3 Months</option>
+                            <option value="6_months" {{ request('period') == '6_months' ? 'selected' : '' }}>Last 6 Months</option>
+                            <option value="1_year" {{ request('period') == '1_year' ? 'selected' : '' }}>Last 1 Year</option>
+                            <option value="custom" {{ request('period') == 'custom' ? 'selected' : '' }}>Custom Date Range</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 custom-date" style="display: none;">
+                        <label>Start Date:</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                    </div>
+                    <div class="col-md-3 custom-date" style="display: none;">
+                        <label>End Date:</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                    </div>
+                    <div class="col-md-3 align-self-end">
+                        <button type="submit" class="btn btn-secondary">Apply Filter</button>
+                    </div>
+                </div>
+            </form>
             <div class="row mb-3">
                 <div class="col-md-3">
                     <label>Filter by Jenis:</label>
@@ -218,6 +247,38 @@
 
 @section('js')
     <script>
+        function toggleCustomDate() {
+            var period = document.getElementById('period-select').value;
+            var customDateInputs = document.querySelectorAll('.custom-date');
+            if (period === 'custom') {
+                customDateInputs.forEach(el => el.style.display = 'block');
+            } else {
+                customDateInputs.forEach(el => el.style.display = 'none');
+            }
+        }
+
+        function exportPdf() {
+            var period = document.getElementById('period-select').value;
+            var startDate = document.querySelector('input[name="start_date"]').value;
+            var endDate = document.querySelector('input[name="end_date"]').value;
+            
+            if (!period && (!startDate || !endDate)) {
+                alert('Please select a period to export.');
+                return;
+            }
+            
+            var url = "{{ route('admin.invoice.export') }}?period=" + period;
+            if (period === 'custom') {
+                url += "&start_date=" + startDate + "&end_date=" + endDate;
+            }
+            window.location.href = url;
+        }
+
+        // Run on load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCustomDate();
+        });
+
         function toggleFields(jenis, idSuffix) {
             if (jenis === 'masuk') {
                 $('#group-pengirim-' + idSuffix).show();

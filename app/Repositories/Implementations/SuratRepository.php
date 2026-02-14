@@ -12,6 +12,17 @@ class SuratRepository implements SuratRepositoryInterface
         return Document::where('type', 'surat')->orderBy('created_at', 'desc')->get();
     }
 
+    public function getFiltered($filters)
+    {
+        $query = Document::where('type', 'surat');
+
+        if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
+            $query->whereBetween('tanggal_dokumen', [$filters['start_date'], $filters['end_date']]);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
+    }
+
     public function find($id)
     {
         return Document::where('type', 'surat')->findOrFail($id);

@@ -17,8 +17,11 @@ Auth::routes();
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('surat/export', [SuratController::class, 'export'])->name('surat.export');
     Route::resource('surat', SuratController::class);
+    Route::get('invoice/export', [InvoiceController::class, 'export'])->name('invoice.export');
     Route::resource('invoice', InvoiceController::class);
+    Route::get('perjanjian-kredit/export', [PerjanjianKreditController::class, 'export'])->name('perjanjian-kredit.export');
     Route::resource('perjanjian-kredit', PerjanjianKreditController::class);
 
     // User Management (Admin Only)

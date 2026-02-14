@@ -29,6 +29,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Username</th>
+                        <th>Role</th>
                         <th>Created At</th>
                         <th>Actions</th>
                     </tr>
@@ -38,6 +39,11 @@
                     <tr>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->username }}</td>
+                        <td>
+                            <span class="badge {{ $user->role === 'admin' ? 'badge-danger' : 'badge-primary' }}">
+                                {{ ucfirst($user->role) }}
+                            </span>
+                        </td>
                         <td>{{ $user->created_at }}</td>
                         <td>
                             <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to reset the password to \'password\'?');">
@@ -77,6 +83,13 @@
                         <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <select class="form-control" id="role" name="role" required>
+                                <option value="operator">Operator</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>

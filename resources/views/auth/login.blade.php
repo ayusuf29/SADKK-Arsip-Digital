@@ -19,7 +19,7 @@
             <a href="{{ url('/') }}"><b>SADKK</b> Bank Sulteng</a>
         </div>
         <div class="card-body">
-            <p class="login-box-msg">Sign in to start your session</p>
+            <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
 
             <form action="{{ route('login') }}" method="post">
                 @csrf
@@ -66,11 +66,7 @@
                 </div>
             </form>
 
-            <p class="mb-1">
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}">I forgot my password</a>
-                @endif
-            </p>
+            
         </div>
         <!-- /.card-body -->
     </div>
