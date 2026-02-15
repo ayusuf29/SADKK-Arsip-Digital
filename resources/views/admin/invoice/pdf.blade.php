@@ -35,7 +35,7 @@
 </head>
 <body>
     <h2 style="text-align: center;">Laporan Invoice Masuk/Keluar</h2>
-    <p>Tanggal Cetak: {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</p>
+    <p>Tanggal Cetak: {{ \Carbon\Carbon::now('Asia/Makassar')->format('d-m-Y H:i') }}</p>
     <table>
         <thead>
             <tr>
