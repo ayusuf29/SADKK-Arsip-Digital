@@ -37,8 +37,7 @@ class UserController extends Controller
             'role' => 'required|in:admin,operator',
         ]);
 
-        $data = $request->all();
-        $data['password'] = Hash::make($request->password);
+        $data = $request->only(['name', 'username', 'password', 'role']);
 
         $this->userRepository->create($data);
 
@@ -61,8 +60,7 @@ class UserController extends Controller
     {
         $user = $this->userRepository->find($id);
         
-        // Reset to default password 'password'
-        $this->userRepository->update($id, ['password' => Hash::make('password')]);
+        $this->userRepository->update($id, ['password' => 'password']);
 
         return redirect()->route('admin.users.index')->with('success', 'Password reset to default "password" successfully.');
     }
